@@ -29,24 +29,16 @@ def select_roulette(pop, f, k):
 
   return np.array(selection)
 
-#incheckeable
-def select_ranking(pop, f, k):
+def select_tourney(pop, f, k, m=2):
   fitness = pop.apply_along_axis(f, 1, pop)
-  rank = np.argsort(fitness)
-  n = len(pop)
-  pseudof = lambda i: (n - rank[i]) / n
-
-  return select_roulette(pop, pseudof, k)
-
-def select_tourney(pop, f, k, m):
-  fitness = pop.apply_along_axis(f, 1, pop)
-  rank = np.argsort(fitness)
+  order = np.argsort(fitness)
   selection = []
 
   for i in range(k):
-    pool = rng.randint(0, pop.shape[0], m)
-    winner = np.max(rank[pool])
-    selection.append(np.where(winner))
+    idxs = rng.randint(0, pop.shape[0], m)
+    pool, aps = pop[idxs], fitness[idxs]
+    winner = pool[np.where(aps == np.max(aps))]
+    selection.append(winner)
   
   return np.array(selection)
 

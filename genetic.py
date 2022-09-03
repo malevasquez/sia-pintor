@@ -1,14 +1,19 @@
 import numpy as np
+import math
+from enum import Enum
 
-rng = np.random.default_rng()
+rng = np.random.RandomState()
+
+def distance(r1, g1, b1, r2, g2, b2):
+    return math.sqrt((math.pow(r2-r1,2) + math.pow(g2-g1,2) + math.pow(b2-b1,2)))
 
 def aptitud(color):
-  pass
+  return 1 / distance
 
 # SELECCION
 
 def select_elite(pop, f, k):
-  fitness = pop.apply_along_axis(f, 1, pop)
+  fitness = np.apply_along_axis(f, 1, pop)
   order = np.argsort(fitness)
   best = np.flip(pop[order], axis=0)
 
@@ -16,31 +21,45 @@ def select_elite(pop, f, k):
 
 def select_roulette(pop, f, k):
   selection = []
-  fitness = pop.apply_along_axis(f, 1, pop)
+  fitness = np.apply_along_axis(f, 1, pop)
+  print(fitness)
   ps = fitness / np.sum(fitness)
+  print(ps)
   qs = np.cumsum(ps)
+  print(qs)
 
   rs = rng.uniform(0., 1., size=(k,))
-
+  print("rs:")
+  print(rs)
   for ri in rs:
     for i in range(len(qs)):
       if (qs[i-1] < ri <= qs[i]):
-        selection.append(qs[i])
+        selection.append(pop[i])
 
   return np.array(selection)
 
 def select_tourney(pop, f, k, m=2):
-  fitness = pop.apply_along_axis(f, 1, pop)
+  fitness = np.apply_along_axis(f, 1, pop)
   order = np.argsort(fitness)
   selection = []
 
   for i in range(k):
-    idxs = rng.randint(0, pop.shape[0], m)
+    idxs = rng.randint(0, len(pop), size=m)
     pool, aps = pop[idxs], fitness[idxs]
+    print("pool:")
+    print(pool)
+    print("aps:")
+    print(aps)
     winner = pool[np.where(aps == np.max(aps))]
+    print("winner:")
+    print(winner)
     selection.append(winner)
   
   return np.array(selection)
+class SelectOption(Enum):
+  ELITE = select_elite
+  ROULETTE = select_roulette
+  TOURNEY = select_tourney
 
 # CRUZA
 
@@ -69,3 +88,4 @@ def cross_uniform(x, y):
   ch2 = np.where(ps < 0.5, x, y)
 
   return ch1, ch2
+

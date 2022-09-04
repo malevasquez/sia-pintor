@@ -3,11 +3,16 @@ from numpy import random
 import math
 
 #calculates the euclidean distance between the rgb spaces of two colors
-def distance(r1, g1, b1, r2, g2, b2):
+def distance(c1, c2):
+    r1, g1, b1 = c1
+    r2, g2, b2 = c2
     return math.sqrt((math.pow(r2-r1,2) + math.pow(g2-g1,2) + math.pow(b2-b1,2)))
 
 
-def mix(r1, g1, b1, r2, g2, b2, p):
+def mix(c1, c2, p):
+    r1, g1, b1 = c1
+    r2, g2, b2 = c2
+
     aux_red = p*math.pow(255-r1,2) + (1-p)*math.pow(255-r2,2)
     aux_green = p*math.pow(255-g1,2) + (1-p)*math.pow(255-(1-p)*g2,2)
     aux_blue = p*math.pow(255-p*b1,2) + (1-p)*math.pow(255-(1-p)*b2,2)
@@ -18,8 +23,32 @@ def mix(r1, g1, b1, r2, g2, b2, p):
 
     return Color((red,green,blue))
 
-def fitness(r1, g1, b1, r2, g2, b2):
-    return 1/distance
+def mix_n(colors, alphas):
+    new_color = (*colors[0], alphas[0])
+
+    for i in range(1, len(colors)):
+        new_color = mix_rgba(new_color, (*colors[i], alphas[i]))
+
+    return new_color
+
+def mix_rgba(c1, c2):
+    r1, g1, b1, a1 = c1
+    r2, g2, b2, a2= c2
+
+    a3 = 1 - (1 - a1) * (1 - a2)
+    
+    # if (a3 < 1.0e-6):
+    #     return 0, 0, 0, a3
+    
+    r3 = r1 * a1 / a3 + r2 * a2 * (1 - a1) / a3
+    g3 = g1 * a1 / a3 + g2 * a2 * (1 - a1) / a3
+    b3 = b1 * a1 / a3 + b2 * a2 * (1 - a1) / a3
+
+    return r3, g3, b3, a3
+
+
+def fitness(c1, c2):
+    return 1 / distance(c1, c2)
 
 c1 = Color((153,102,255))
 c2 = Color((255,255,102))

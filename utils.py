@@ -11,3 +11,6 @@ def get_colors(path) -> np.ndarray:
     r, g, b = (int(x) for x in row)
     colores.append( (r, g, b) )
   return np.array(colores, dtype=np.uint8)
+
+def check_finished():
+  pass

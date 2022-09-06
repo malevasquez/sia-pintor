@@ -1,4 +1,3 @@
-# from colorutils import Color
 import numpy as np
 import math 
 

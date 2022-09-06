@@ -1,4 +1,3 @@
-from audioop import cross
 import numpy as np
 
 global goal
@@ -14,8 +13,7 @@ def main():
   print("palette")
   print(palette.shape)
   print(palette)
-  # goal = np.array([int(x) for x in input("objective color: ").split(',')], dtype=np.uint8)
-  goal = (255,125,0)
+  goal = np.array([int(x) for x in input("objective color: ").split(',')], dtype=np.uint8)
 
   selector = genetic.SelectOption.ELITE
   cross_method = genetic.CrossOption.SIMPLE

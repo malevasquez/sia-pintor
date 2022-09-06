@@ -1,77 +1,31 @@
-from turtle import shape
+from select import select
 import numpy as np
-import math
-import colors
+from colors import distance, MAX_DISTANCIA
 from enum import Enum
 
-goal = (50, 50, 50)
 rng = np.random.default_rng()
 
-def distance2(c1, c2):
-  r1, g1, b1 = c1
-  r2, g2, b2 = c2
-
-  d_r = r1 - r2
-  d_g = g1 - g2
-  d_b = b1 - b2
-  
-  d = math.sqrt( (d_r**2) + (d_g**2) + (d_b**2) )
-
-
-  # r_ = 0.5 * (r1 + r2)
-
-  # d = math.sqrt(
-  #   (2 + (r_ / 256)) * (d_r**2)
-  # + (4 * (d_g**2))
-  # + (2 + (255 - r_) / 256) * (d_b**2) )
-
-  return d
-
-
-MAX_DISTANCIA = distance2((0,0,0), (255,255,255))
-
-def distance_w(c1, c2):
-  r1, g1, b1 = c1
-  r2, g2, b2 = c2
-
-  d_r = r1 - r2
-  d_g = g1 - g2
-  d_b = b1 - b2
-
-  return math.sqrt((0.3 * (d_r**2)) + (0.59 * (d_g**2)) + (0.11 * (d_b)**2))
-
-def distance(r1, g1, b1, r2, g2, b2):
-    return math.sqrt((math.pow(r2-r1,2) + math.pow(g2-g1,2) + math.pow(b2-b1,2)))
-
-def aptitud(color):
-  return 1 - (distance2(color, goal) / MAX_DISTANCIA)
-
-def distancia(color, goal):
-  r1, g1, b1, a1 = color
-  r2, g2, b2, a2 = goal
-  return math.sqrt()
+def aptitud(color, goal):
+  return 1 - (distance(color, goal) / MAX_DISTANCIA)
 
 # SELECCION
 
-def select_elite(pop, mixes, f, k):
-  fitness = np.apply_along_axis(f, 1, mixes)
+def select_elite(pop, mixes, f, k, goal):
+  fitness = np.apply_along_axis(f, 1, mixes, (goal))
   order = np.argsort(fitness)
   best = np.flip(pop[order], axis=0)
 
   return best[:k]
 
-def select_roulette(pop, mixes, f, k):
-  selection = []
-  fitness = np.apply_along_axis(f, 1, mixes)
-  # print(fitness)
-  ps = fitness / np.sum(fitness)
-  # print(ps)
-  qs = np.cumsum(ps)
-  # print(qs)
+def select_roulette(pop, mixes, f, k, goal):
+  fitness = np.apply_along_axis(f, 1, mixes, (goal))
+  sum_fitness = np.sum(fitness)
 
+  ps = fitness / sum_fitness
+  qs = np.cumsum(ps)
   rs = rng.uniform(0., 1., size=(k,))
-  # print("rs:")
-  # print(rs)
+
+  selection = []
   for ri in rs:
     for i in range(len(qs)):
       if (qs[i-1] < ri <= qs[i]):
@@ -79,29 +33,19 @@ def select_roulette(pop, mixes, f, k):
 
   return np.array(selection)
 
-def select_tourney(pop, f, k, m=2):
-  fitness = np.apply_along_axis(f, 1, pop)
+def select_tourney(pop, mixes, f, k, goal, m=2):
+  fitness = np.apply_along_axis(f, 1, mixes, (goal))
   order = np.argsort(fitness)
-  selection = []
+  pop = pop[order]
 
+  selection = []
   for i in range(k):
-    idxs = rng.integers(0, len(pop), m)
-    pool, aps = pop[idxs], fitness[idxs]
-    # print("pool:")
-    # print(pool)
-    # print("aps:")
-    # print(aps)
-    winner = pool[np.where(aps == np.max(aps))]
-    # print("winner:")
-    # print(winner)
+    idxs = rng.choice(len(pop), size=k, replace=False)
+    winner = pop[np.max(idxs)]
     selection.append(winner)
-  
+
   return np.array(selection)
 
-class SelectOption(Enum):
-  ELITE = select_elite
-  ROULETTE = select_roulette
-  TOURNEY = select_tourney
 
 # CRUZA
 
@@ -131,6 +75,16 @@ def cross_uniform(x, y):
 
   return ch1, ch2
 
+def cross_n(parents, method):
+  children = []
+  for i in range(0, len(parents) // 2 + 1, 2):
+    ch1, ch2 = method(parents[i], parents[i+1])
+    
+    children.append(ch1)
+    children.append(ch2)
+
+  return np.array(children)
+
 # MUTACION
 
 def mutate(pi):
@@ -141,27 +95,19 @@ def mutate(pi):
 
   return pf
   
-def cross_n(parents):
-  children = []
-  for i in range(0, len(parents) // 2 + 1, 2):
-    # print("parents")
-    # print(parents[0], parents[1])
-    # print("children")
-    # print(children)
-
-    ch1, ch2 = cross_simple(parents[i], parents[i+1])
-    
-    children.append(ch1)
-    children.append(ch2)
-
-
-  return np.array(children)
-
 def mutate_n(pop):
   probs = rng.random(size=pop.shape)
-  mutated = np.where(probs > 0.5, pop + 0.05, pop - 0.05)
-  mutated = np.abs(mutated)
+  deltas = rng.uniform(-0.1, 0.1, size=pop.shape)
+
+  mutated = np.abs(np.where(probs > 0.5, pop + deltas, pop))
   return mutated
 
-def fill(parents, children, n, k):
-  pass
+class SelectOption(Enum):
+  ELITE = select_elite
+  ROULETTE = select_roulette
+  TOURNEY = select_tourney
+
+class CrossOption(Enum):
+  SIMPLE = cross_simple
+  DOUBLE = cross_double
+  UNIFORM = cross_uniform  

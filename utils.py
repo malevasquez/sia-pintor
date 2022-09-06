@@ -18,20 +18,8 @@ last_fitness = []
 
 def check_finished(iter, pop, mixes, delta, goal):
 
-  if (iter >= 100):
-    return True
-
   aps = np.apply_along_axis(genetic.aptitud, 1, mixes, (goal))
   best_aps = np.max(aps)
-
-  if (len(last_fitness) < 5):
-    last_fitness.append(best_aps)
-  else:
-    last_fitness.pop(0)
-    last_fitness.append(best_aps)
-
-  if(np.std(last_fitness) < 0.1):
-    end = True
 
   order = np.argsort(aps)
   best = np.flip(mixes[order], axis=0)
@@ -45,15 +33,10 @@ def check_finished(iter, pop, mixes, delta, goal):
   pop = np.flip(pop[order], axis=0)
   print(pop[0])
 
-
-  return False
-
-  if (iter >=  max_iter):
+  if ( iter >= 1000 or 1 - best_aps < delta):
     return True
 
-  cond =  (1 - best_aps) < delta
-
-  return cond, best, best_ap, 
+  return False
 
 
 def get_mixes(rgbp):

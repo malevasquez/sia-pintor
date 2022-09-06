@@ -27,7 +27,7 @@ def main():
   pop = rng.uniform(0., 1., size=(N, len(palette)))
 
   end = False
-  delta = 0.01
+  delta = 0.02
   i = 0
 
   while (not end):

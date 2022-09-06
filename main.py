@@ -7,6 +7,17 @@ import genetic
 
 rng = np.random.default_rng()
 
+# SELECT METHODS
+# selection:
+#   elite
+#   roulette
+#   tourney
+# crossover:
+#   simple
+#   double
+#   uniform
+selector = genetic.SelectOption.ELITE
+cross_method = genetic.CrossOption.SIMPLE
 
 def main():
   palette = utils.get_colors("./colores.csv")
@@ -15,8 +26,6 @@ def main():
   print(palette)
   goal = np.array([int(x) for x in input("objective color: ").split(',')], dtype=np.uint8)
 
-  selector = genetic.SelectOption.ELITE
-  cross_method = genetic.CrossOption.SIMPLE
 
   # goal = np.array([int(x) for x in sys.argv[1].split(',')], dtype=np.uint8)
 

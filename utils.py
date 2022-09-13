@@ -3,6 +3,13 @@ import numpy as np
 from csv import reader
 import genetic
 import colors
+import matplotlib.pyplot as plt
+
+xpoints = []
+ypoints = []
+y_red = []
+y_green = []
+y_blue = []
 
 def get_colors(path) -> np.ndarray:
   file = open(path)
@@ -25,6 +32,12 @@ def check_finished(iter, pop, mixes, delta, goal):
   best = np.flip(mixes[order], axis=0)
   best = best[0]
 
+  xpoints.append(iter)
+  # ypoints.append(best_aps)
+  y_red.append(best[0])
+  y_green.append(best[1])
+  y_blue.append(best[2])
+
   print(best_aps)
   
   print("best mix con aptitud = {}".format(best_aps))
@@ -34,6 +47,11 @@ def check_finished(iter, pop, mixes, delta, goal):
   print(pop[0])
 
   if ( iter >= 1000 or 1 - best_aps < delta):
+    # plt.plot(xpoints, ypoints)
+    plt.plot(xpoints, y_red, 'r-')
+    plt.plot(xpoints, y_green, 'g-')
+    plt.plot(xpoints, y_blue, 'b-')
+    plt.show()
     return True
 
   return False

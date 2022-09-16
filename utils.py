@@ -33,10 +33,10 @@ def check_finished(iter, pop, mixes, delta, goal):
   best = best[0]
 
   xpoints.append(iter)
-  # ypoints.append(best_aps)
-  y_red.append(best[0])
-  y_green.append(best[1])
-  y_blue.append(best[2])
+  ypoints.append(best_aps)
+  # y_red.append(best[0])
+  # y_green.append(best[1])
+  # y_blue.append(best[2])
 
   print(best_aps)
   
@@ -48,13 +48,24 @@ def check_finished(iter, pop, mixes, delta, goal):
 
   if ( iter >= 1000 or 1 - best_aps < delta):
     # plt.plot(xpoints, ypoints)
-    plt.plot(xpoints, y_red, 'r-')
-    plt.plot(xpoints, y_green, 'g-')
-    plt.plot(xpoints, y_blue, 'b-')
-    plt.show()
+    # plt.plot(xpoints, y_red, 'r-')
+    # plt.plot(xpoints, y_green, 'g-')
+    # plt.plot(xpoints, y_blue, 'b-')
+    # plt.show()
+
+    # plt.scatter(xpoints, y_red, s=None, c='Red', cmap='Reds')
+    # plt.scatter(xpoints, y_green, s=None, c='Green', cmap='Reds')
+    # plt.scatter(xpoints, y_blue, s=None, c='Blue', cmap='Reds')
+    # plt.xlabel("iteraciones")
+    # plt.ylabel("aptitudes")
+    # plt.title("Selección Elite, Cruza Simple")
+    # plt.show()
+    print(xpoints)
+    print(ypoints)
     return True
 
   return False
+
 
 
 def get_mixes(rgbp):

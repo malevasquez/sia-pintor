@@ -86,20 +86,18 @@ def cross_n(parents, method):
   return np.array(children)
 
 # MUTACION
+def mutate_gen(gen):
+  u = gen * 0.5
+  delta = rng.uniform(-u, u)
+  return gen + delta
 
 def mutate(pi):
-  deltas = rng.uniform(-0.05, 0.05, len(pi))
-
-  pf = pi + deltas
-  pf = np.abs(pf)
-
-  return pf
+  probs = rng.uniform(0, 1, len(pi))
+  pi = np.where(probs > 0.5, mutate_gen(pi), pi)
+  return pi
   
 def mutate_n(pop):
-  probs = rng.random(size=pop.shape)
-  deltas = rng.uniform(-0.1, 0.1, size=pop.shape)
-
-  mutated = np.abs(np.where(probs > 0.5, pop + deltas, pop))
+  mutated = np.apply_along_axis(mutate, 1, pop)
   return mutated
 
 class SelectOption(Enum):

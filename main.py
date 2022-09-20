@@ -16,7 +16,7 @@ rng = np.random.default_rng()
 #   simple
 #   double
 #   uniform
-selector = genetic.SelectOption.ELITE
+selector = genetic.SelectOption.ROULETTE
 cross_method = genetic.CrossOption.SIMPLE
 
 def main():
@@ -34,8 +34,8 @@ def main():
   pop = rng.uniform(0., 1., size=(N, len(palette)))
 
   end = False
-  delta = 0.02
-  i = 0
+  delta = 0.01
+  i = 0 
 
   while (not end):
     print("iteracion: " + str(i))
@@ -46,21 +46,18 @@ def main():
     # check criteria
     end = utils.check_finished(i, pop, mixes, delta, goal)
 
-    # CRUZA
-    parents = pop
+    # SELECTION
+    parents = selector(pop, mixes, genetic.aptitud, N, goal)
+
+    # CROSSOVER
     children = genetic.cross_n(parents, cross_method)
 
-    parentswithchildren = np.concatenate((parents, children), axis=0)
+    newpop = children if len(children) == N else np.concatenate((children, parents[:(N - len(children))]), axis=0)
 
-    # calculo de mezclas resultantes
-    rgbp = utils.get_rgbp(palette, parentswithchildren)
-    mixes = utils.get_mixes(rgbp)
+    # MUTATION
+    newpop = genetic.mutate_n(newpop)
 
-    # MUTACION
-    parentswithchildren = genetic.mutate_n(parentswithchildren)
-
-    # SELECCION 
-    pop = selector(parentswithchildren, mixes, genetic.aptitud, N, goal)
+    pop = newpop
 
     i += 1
 

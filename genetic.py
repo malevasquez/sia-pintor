@@ -92,7 +92,7 @@ def mutate_gen(gen):
   return gen + delta
 
 def mutate(pi):
-  probs = rng.uniform(0, 1, len(pi))
+  probs = rng.uniform(0., 1., len(pi))
   pi = np.where(probs > 0.5, mutate_gen(pi), pi)
   return pi
   

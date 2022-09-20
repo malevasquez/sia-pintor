@@ -60,8 +60,8 @@ def check_finished(iter, pop, mixes, delta, goal):
     # plt.ylabel("aptitudes")
     # plt.title("Selección Elite, Cruza Simple")
     # plt.show()
-    print(xpoints)
-    print(ypoints)
+    # print(xpoints)
+    # print(ypoints)
     return True
 
   return False
